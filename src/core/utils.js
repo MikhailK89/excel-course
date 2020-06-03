@@ -56,3 +56,12 @@ export function debounce(fn, wait) {
     timeout = setTimeout(later, wait)
   }
 }
+
+// создаёт копию объекта
+export function clone(obj) {
+  return JSON.parse(JSON.stringify(obj))
+}
+
+export function preventDefault(event) {
+  event.preventDefault()
+}
