@@ -5,11 +5,7 @@ export class ExcelStateComponent extends ExcelComponent {
     super(...args)
   }
 
-  // перезаписан в Toolbar
-  get template() {
-    return JSON.stringify(this.state, null, 2)
-  }
-
+  // this.state хранит currentStyles
   initState(initialState = {}) {
     this.state = {...initialState}
   }
