@@ -9,6 +9,7 @@ import {matrix} from '@/components/table/table.functions'
 import {nextSelector} from '@/components/table/table.functions'
 import {parse} from '@core/parse'
 import {defaultStyles} from '@/constants'
+import {selectHandler} from '@/components/table/table.select'
 import * as actions from '@/redux/actions'
 
 export class Table extends ExcelComponent {
@@ -60,7 +61,7 @@ export class Table extends ExcelComponent {
     this.$emit('table:select', $cell)
 
     const styles = $cell.getStyles(Object.keys(defaultStyles))
-    this.$dispatch(actions.changeStyles(styles))
+    this.$dispatch(actions.changeStyles(styles)) // currentStyles
   }
 
   async resizeTable(event) {
@@ -69,6 +70,17 @@ export class Table extends ExcelComponent {
       this.$dispatch(actions.tableResize(data))
     } catch (e) {
       console.warn('Resize error:', e.message)
+    }
+  }
+
+  async selectTable(event) {
+    try {
+      const $cell = await selectHandler(this.$root, this.selection, event)
+      if ($cell) {
+        this.selectCell($cell)
+      }
+    } catch (e) {
+      console.warn('Select error:', e.message)
     }
   }
 
@@ -82,7 +94,7 @@ export class Table extends ExcelComponent {
             .map(id => this.$root.find(`[data-id="${id}"]`))
         this.selection.selectGroup($cells)
       } else {
-        this.selectCell($target)
+        this.selectTable(event)
       }
     }
   }

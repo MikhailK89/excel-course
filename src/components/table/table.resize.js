@@ -14,21 +14,21 @@ export function resizeHandler($root, event) {
       [sideProp]: '-5000px'
     })
 
-    document.onmousemove = e => {
+    const mousemoveHandler = e => {
       if (type === 'col') {
         const delta = Math.floor(e.pageX - coords.right)
         value = coords.width + delta
         $resizer.css({right: -delta + 'px'})
       } else {
-        const delta = e.pageY - coords.bottom
+        const delta = Math.floor(e.pageY - coords.bottom)
         value = coords.height + delta
         $resizer.css({bottom: -delta + 'px'})
       }
     }
 
-    document.onmouseup = () => {
-      document.onmousemove = null
-      document.onmouseup = null
+    const mouseupHandler = () => {
+      document.removeEventListener('mousemove', mousemoveHandler)
+      document.removeEventListener('mouseup', mouseupHandler)
 
       if (type === 'col') {
         $parent.css({width: value + 'px'})
@@ -51,5 +51,8 @@ export function resizeHandler($root, event) {
         right: 0
       })
     }
+
+    document.addEventListener('mousemove', mousemoveHandler)
+    document.addEventListener('mouseup', mouseupHandler)
   })
 }

@@ -19,9 +19,9 @@ export class Toolbar extends ExcelStateComponent {
     this.initState(defaultStyles)
   }
 
-  // рендерит Toolbar
+  // возвращает html компонента Toolbar
   get template() {
-    return createToolbar(this.state)
+    return createToolbar(this.state) // только currentStyles
   }
 
   toHTML() {
