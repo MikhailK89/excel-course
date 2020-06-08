@@ -25,7 +25,7 @@ It's a "non build" version of the project.
 
 To start this project on your local machine you need to follow the next steps:
 1. install the modules using the command `npm install`
-2. start project using the command `npm start` or `npm run start`
+2. start project using the commands `npm start` or `npm run start`
 
 To start building a project use the command `npm run build`.
 The "build" version of the project will be located in the directory `/dist`.
