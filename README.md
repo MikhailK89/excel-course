@@ -17,6 +17,7 @@ Some new features have been added by me:
 4. unselect row and column headings during cells resizing
 5. adding the ability to enter a formula in a cell
 6. getting a formula of an active cell (or value when cell is inactive)
+7. delete styles and data from a selected group of cells (using delete button)
 
 ## Links
 The project idea was taken from Vladilen Minin programming course.
