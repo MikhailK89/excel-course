@@ -1,5 +1,5 @@
 export function parse(value = '') {
-  if (value.startsWith('=')) {
+  if (isFormula(value)) {
     try {
       return eval(value.slice(1))
     } catch (e) {
@@ -7,4 +7,8 @@ export function parse(value = '') {
     }
   }
   return value
+}
+
+export function isFormula(value) {
+  return value.startsWith('=')
 }

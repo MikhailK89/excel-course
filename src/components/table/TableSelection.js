@@ -1,3 +1,5 @@
+import {isFormula} from '@core/parse'
+
 export class TableSelection {
   static classNames = [
     'selected-full',
@@ -14,9 +16,9 @@ export class TableSelection {
 
   select($el) {
     this.clear()
-    $el.focus().addClass(TableSelection.classNames[0])
     this.group.push($el)
     this.current = $el
+    $el.addClass(TableSelection.classNames[0])
   }
 
   clear() {
@@ -35,6 +37,7 @@ export class TableSelection {
   selectGroup($group = []) {
     this.clear()
     this.group = $group
+    this.current = $group[0]
 
     const firstElem = this.group[0].id(true)
     const lastElem = this.group[this.group.length - 1].id(true)
@@ -58,7 +61,22 @@ export class TableSelection {
     })
   }
 
+  removeContent() {
+    if (this.group.length > 1) {
+      this.group.forEach($el => {
+        $el.clear()
+        $el.attr('data-value', '')
+      })
+      return true
+    }
+    return false
+  }
+
   applyStyle(style) {
-    this.group.forEach($el => $el.css(style))
+    this.group.forEach($el => {
+      if (!isFormula($el.text())) {
+        $el.css(style)
+      }
+    })
   }
 }

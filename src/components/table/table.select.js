@@ -5,7 +5,7 @@ export function selectHandler($root, selection, event) {
   return new Promise(resolve => {
     const $current = $(event.target)
     let $target
-    let $cells
+    let $cells = [$current]
 
     const mousemoveHandler = e => {
       $target = $(document.elementFromPoint(e.clientX, e.clientY))
@@ -23,11 +23,11 @@ export function selectHandler($root, selection, event) {
       document.removeEventListener('mouseup', mouseupHandler)
 
       if (!$target) {
-        resolve($current)
+        resolve($cells)
       } else if ($current.id() === $target.id()) {
-        resolve($current)
+        resolve($cells)
       } else {
-        resolve(null)
+        resolve($cells)
       }
     }
 

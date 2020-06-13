@@ -59,25 +59,23 @@
     outline: none;
 
     &.selected-full {
-      border: none;
-      outline: 2px solid #3c74ff;
-      z-index: 2;
+      border: 1.5px solid #3c74ff;
     }
 
     &.selected-top {
-      border-top: 2px solid #3c74ff;
+      border-top: 1.5px solid #3c74ff;
     }
 
     &.selected-bottom {
-      border-bottom: 2px solid #3c74ff;
+      border-bottom: 1.5px solid #3c74ff;
     }
 
     &.selected-left {
-      border-left: 2px solid #3c74ff;
+      border-left: 1.5px solid #3c74ff;
     }
 
     &.selected-right {
-      border-right: 2px solid #3c74ff;
+      border-right: 1.5px solid #3c74ff;
     }
   }
 

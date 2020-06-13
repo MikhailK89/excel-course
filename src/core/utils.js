@@ -65,3 +65,8 @@ export function clone(obj) {
 export function preventDefault(event) {
   event.preventDefault()
 }
+
+// снимает выделение текста
+export function removeTextSelection() {
+  window.getSelection().removeAllRanges()
+}
