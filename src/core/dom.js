@@ -98,7 +98,18 @@ class Dom {
   }
 
   focus() {
-    this.$el.focus()
+    if (this.text() === '') {
+      this.$el.focus()
+    } else {
+      const range = document.createRange()
+      range.setStart(this.$el.childNodes[0], this.text().length)
+      range.collapse(true)
+
+      const sel = window.getSelection()
+      sel.removeAllRanges()
+      sel.addRange(range)
+    }
+
     return this
   }
 

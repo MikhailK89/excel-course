@@ -4,6 +4,8 @@ import {CHANGE_STYLES} from '@/redux/types'
 import {APPLY_STYLE} from '@/redux/types'
 import {CHANGE_TITLE} from '@/redux/types'
 import {UPDATE_DATE} from '@/redux/types'
+import {CLEAR_STATE} from '@/redux/types'
+import {defaultStyles} from '@/constants'
 
 export function rootReducer(state, action) {
   let field
@@ -40,6 +42,20 @@ export function rootReducer(state, action) {
       return {...state, title: action.data}
     case UPDATE_DATE:
       return {...state, openDate: new Date().toJSON()}
+    case CLEAR_STATE:
+      action.data.fields.forEach(field => {
+        val = state[field]
+        action.data.group.forEach($el => {
+          val[$el.id()] = field === 'dataState'
+            ? ''
+            : {...defaultStyles}
+        })
+      })
+      return {
+        ...state,
+        currentText: '',
+        currentStyles: {...defaultStyles}
+      }
     default:
       return state
   }

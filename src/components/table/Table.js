@@ -10,6 +10,7 @@ import {nextSelector} from '@/components/table/table.functions'
 import {parse} from '@core/parse'
 import {defaultStyles} from '@/constants'
 import {selectHandler} from '@/components/table/table.select'
+import {isFormula} from '@core/parse'
 import * as actions from '@/redux/actions'
 
 export class Table extends ExcelComponent {
@@ -21,6 +22,8 @@ export class Table extends ExcelComponent {
       listeners: ['mousedown', 'keydown', 'input'],
       ...options
     })
+
+    this.$prevCell = null
   }
 
   toHTML() {
@@ -38,8 +41,7 @@ export class Table extends ExcelComponent {
 
     this.$on('formula:input', value => {
       this.selection.current
-          .attr('data-value', value)
-          .text(parse(value))
+          .text(value)
       this.updateTextInStore(value)
     })
 
@@ -48,7 +50,9 @@ export class Table extends ExcelComponent {
     })
 
     this.$on('toolbar:applyStyle', value => {
+      this.selection.current.focus()
       this.selection.applyStyle(value)
+
       this.$dispatch(actions.applyStyle({
         value,
         ids: this.selection.selectedIds
@@ -56,12 +60,38 @@ export class Table extends ExcelComponent {
     })
   }
 
-  selectCell($cell) {
-    this.selection.select($cell)
+  sendCellData($cell) {
     this.$emit('table:select', $cell)
 
     const styles = $cell.getStyles(Object.keys(defaultStyles))
     this.$dispatch(actions.changeStyles(styles)) // currentStyles
+  }
+
+  selectCell($cell, withSelection = true) {
+    if (this.$prevCell && this.$prevCell.id() === $cell.id()) {
+      return null
+    }
+
+    if (this.$prevCell) {
+      this.$prevCell.text(parse(this.$prevCell.text()))
+      const state = this.store.getState()
+      const style = state.stylesState[this.$prevCell.id()]
+      this.$prevCell.css(style)
+    }
+    this.$prevCell = $cell
+
+    this.sendCellData($cell)
+
+    $cell.text($cell.data.value)
+
+    if (withSelection) {
+      this.selection.select($cell)
+    }
+    $cell.focus()
+
+    if (isFormula($cell.text())) {
+      $cell.css({...defaultStyles})
+    }
   }
 
   async resizeTable(event) {
@@ -75,9 +105,11 @@ export class Table extends ExcelComponent {
 
   async selectTable(event) {
     try {
-      const $cell = await selectHandler(this.$root, this.selection, event)
-      if ($cell) {
-        this.selectCell($cell)
+      const $cells = await selectHandler(this.$root, this.selection, event)
+      if ($cells.length === 1) {
+        this.selectCell($cells[0])
+      } else {
+        this.selectCell($cells[0], false)
       }
     } catch (e) {
       console.warn('Select error:', e.message)
@@ -85,15 +117,17 @@ export class Table extends ExcelComponent {
   }
 
   onMousedown(event) {
+    const $target = $(event.target)
+
     if (shouldResize(event)) {
       this.resizeTable(event)
     } else if (isCell(event)) {
-      const $target = $(event.target)
       if (event.shiftKey) {
         const $cells = matrix($target, this.selection.current)
             .map(id => this.$root.find(`[data-id="${id}"]`))
         this.selection.selectGroup($cells)
       } else {
+        this.selectCell($target)
         this.selectTable(event)
       }
     }
@@ -116,11 +150,26 @@ export class Table extends ExcelComponent {
 
       const id = this.selection.current.id(true)
       const $next = this.$root.find(nextSelector(key, id))
+
       this.selectCell($next)
+    }
+
+    if (event.key === 'Delete') {
+      if (this.selection.removeContent()) {
+        this.selection.applyStyle({...defaultStyles})
+
+        this.$dispatch(actions.clearState({
+          fields: ['dataState', 'stylesState'],
+          group: this.selection.group
+        }))
+      }
     }
   }
 
   updateTextInStore(value) {
+    this.selection.current
+        .attr('data-value', value)
+
     this.$dispatch(actions.changeText({
       id: this.selection.current.id(),
       value
@@ -128,6 +177,10 @@ export class Table extends ExcelComponent {
   }
 
   onInput(event) {
-    this.updateTextInStore($(event.target).text())
+    const $target = $(event.target)
+    if (isFormula($target.text())) {
+      $target.css({...defaultStyles})
+    }
+    this.updateTextInStore($target.text())
   }
 }

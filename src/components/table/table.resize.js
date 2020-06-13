@@ -1,4 +1,5 @@
 import {$} from '@core/dom'
+import {removeTextSelection} from '@core/utils'
 
 export function resizeHandler($root, event) {
   return new Promise(resolve => {
@@ -24,6 +25,7 @@ export function resizeHandler($root, event) {
         value = coords.height + delta
         $resizer.css({bottom: -delta + 'px'})
       }
+      removeTextSelection()
     }
 
     const mouseupHandler = () => {
