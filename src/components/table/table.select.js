@@ -6,15 +6,24 @@ export function selectHandler($root, selection, event) {
     const $current = $(event.target)
     let $target
     let $cells = [$current]
+    let $prevCell = $current
+
+    selection.select($current)
 
     const mousemoveHandler = e => {
       $target = $(document.elementFromPoint(e.clientX, e.clientY))
-      if ($target.data.type === 'cell' && $current.id() !== $target.id()) {
-        $cells = matrix($target, $current)
-            .map(id => $root.find(`[data-id="${id}"]`))
-        selection.selectGroup($cells)
-      } else if ($current.id() === $target.id()) {
-        selection.select($current)
+
+      if ($target.data.type === 'cell') {
+        if ($target.id() !== $prevCell.id()) {
+          if ($target.id() !== $current.id()) {
+            $cells = matrix($target, $current)
+                .map(id => $root.find(`[data-id="${id}"]`))
+            selection.selectGroup($cells)
+          } else {
+            selection.select($current)
+          }
+          $prevCell = $target
+        }
       }
     }
 
