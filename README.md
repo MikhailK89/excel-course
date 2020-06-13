@@ -13,6 +13,10 @@ The following basic features are implemented in this project:
 Some new features have been added by me:
 1. new cells selection logic (using mouse)
 2. highlighting the selection of a group of cells along the outer contour
+3. add focus to the end of the line inside div contenteditable cells
+4. unselect row and column headings during cells resizing
+5. adding the ability to enter a formula in a cell
+6. getting a formula of an active cell (or value when cell is inactive)
 
 ## Links
 The project idea was taken from Vladilen Minin programming course.
