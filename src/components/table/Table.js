@@ -37,7 +37,7 @@ export class Table extends ExcelComponent {
   init() {
     super.init()
 
-    this.selectCell(this.$root.find('[data-id="0:0"]'))
+    this.activateCell(this.$root.find('[data-id="0:0"]'))
 
     this.$on('formula:input', value => {
       this.selection.current
@@ -67,26 +67,33 @@ export class Table extends ExcelComponent {
     this.$dispatch(actions.changeStyles(styles)) // currentStyles
   }
 
-  selectCell($cell, withSelection = true) {
+  deactivateCell($cell) {
+    if (isFormula($cell.text())) {
+      $cell.text(parse($cell.text()))
+      const state = this.store.getState()
+      const style = state.stylesState[$cell.id()]
+      $cell.css(style)
+    }
+  }
+
+  activateCell($cell, withSelection = true) {
+    if (withSelection) {
+      this.selection.select($cell)
+    }
+
     if (this.$prevCell && this.$prevCell.id() === $cell.id()) {
       return null
     }
 
     if (this.$prevCell) {
-      this.$prevCell.text(parse(this.$prevCell.text()))
-      const state = this.store.getState()
-      const style = state.stylesState[this.$prevCell.id()]
-      this.$prevCell.css(style)
+      this.deactivateCell(this.$prevCell)
     }
+
     this.$prevCell = $cell
 
     this.sendCellData($cell)
 
     $cell.text($cell.data.value)
-
-    if (withSelection) {
-      this.selection.select($cell)
-    }
     $cell.focus()
 
     if (isFormula($cell.text())) {
@@ -107,9 +114,9 @@ export class Table extends ExcelComponent {
     try {
       const $cells = await selectHandler(this.$root, this.selection, event)
       if ($cells.length === 1) {
-        this.selectCell($cells[0])
+        this.activateCell($cells[0])
       } else {
-        this.selectCell($cells[0], false)
+        this.activateCell($cells[0], false)
       }
     } catch (e) {
       console.warn('Select error:', e.message)
@@ -127,7 +134,9 @@ export class Table extends ExcelComponent {
             .map(id => this.$root.find(`[data-id="${id}"]`))
         this.selection.selectGroup($cells)
       } else {
-        this.selectCell($target)
+        if ($target.id() !== this.$prevCell.id()) {
+          this.deactivateCell(this.$prevCell)
+        }
         this.selectTable(event)
       }
     }
@@ -151,7 +160,7 @@ export class Table extends ExcelComponent {
       const id = this.selection.current.id(true)
       const $next = this.$root.find(nextSelector(key, id))
 
-      this.selectCell($next)
+      this.activateCell($next)
     }
 
     if (event.key === 'Delete') {
