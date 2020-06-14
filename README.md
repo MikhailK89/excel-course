@@ -24,6 +24,7 @@ The project idea was taken from Vladilen Minin programming course.
 You can find out more information at the following links:
 1. https://www.vladilen.dev/
 2. https://www.youtube.com/channel/UCg8ss4xW9jASrqWGP30jXiw
+3. https://github.com/vladilenm
 
 ## Start
 It's a "non build" version of the project.
